@@ -4,7 +4,7 @@ using CounterStrikeSharp.API.Core;
 public class PluginConfig : BasePluginConfig
 {
     [JsonPropertyName("endpoint")]
-    public string Endpoint { get; set; } = "monitoringInfo";
+    public string Endpoint { get; set; } = "monitoring-info";
 
     [JsonPropertyName("min_interval_update")]
     public int MinIntervalUpdate { get; set; } = 30;
