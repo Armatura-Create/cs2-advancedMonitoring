@@ -60,9 +60,11 @@ curl -X GET http://server-ip:server-port/monitoring-info/
             "Statistic": {
                 "Kills": 0,
                 "Headshots": 0,
+                "KnifeKills": 0,
                 "Damage": 59,
                 "Deaths": 1,
                 "Assists": 0,
+                "Shoots": 0,
                 "Score": 0
             },
             "Ping": 41,

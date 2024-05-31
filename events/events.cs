@@ -15,6 +15,7 @@ public class Events {
         Instance.RegisterEventHandler<EventPlayerDisconnect>(OnPlayerDisconnected);
         Instance.RegisterEventHandler<EventPlayerDeath>(OnPlayerDeath);
         Instance.RegisterEventHandler<EventPlayerHurt>(OnPlayerHurt);
+        Instance.RegisterEventHandler<EventPlayerShoot>(OnPlayerShoot);
     }
 
     private HookResult OnRoundEnd(EventRoundEnd @event, GameEventInfo info)
@@ -51,7 +52,7 @@ public class Events {
 
         if (@event.Attacker != null && @event.Attacker != @event.Userid)
         {
-            Instance.Cache.UpdateKill(@event.Attacker, @event.Headshot);
+            Instance.Cache.UpdateKill(@event.Attacker, @event.Headshot, @event.Weapon);
         }
         
         return HookResult.Continue;
@@ -71,6 +72,17 @@ public class Events {
             return HookResult.Continue;
             
         Instance.Cache.UpdateDamage(attacker, @event.DmgHealth);
+
+        return HookResult.Continue;
+    }
+
+    private HookResult OnPlayerShoot(EventPlayerShoot @event, GameEventInfo info)
+    {
+        CCSPlayerController? player = @event.Userid;
+        if (player == null || !player.IsValid || !player.PlayerPawn.IsValid)
+            return HookResult.Continue;
+
+        Instance.Cache.UpdateCountShoots(player);
 
         return HookResult.Continue;
     }

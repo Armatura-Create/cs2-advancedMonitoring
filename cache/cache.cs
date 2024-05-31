@@ -81,7 +81,7 @@ public class Cache
         }
     }
 
-    public void UpdateKill(CCSPlayerController? player, bool headshot)
+    public void UpdateKill(CCSPlayerController? player, bool headshot, string weapon)
     {
         if (player == null)
         {
@@ -100,6 +100,30 @@ public class Cache
                     {
                         p.Statistic.Headshots++;
                     }
+                    if (weapon.Contains("knife"))
+                    {
+                        p.Statistic.KnifeKills++;
+                    }
+                }
+            });
+        }
+    }
+
+    public void UpdateCountShoots(CCSPlayerController? player)
+    {
+        if (player == null)
+        {
+            Library.PrintConsole("UpdateCountShoots Player is null.");
+            return;
+        }
+
+        lock (dataLock)
+        {
+            currentServerData.Players.ForEach(p =>
+            {
+                if (p.SteamID64 == player.AuthorizedSteamID?.SteamId64.ToString())
+                {
+                    p.Statistic.Shoots++;
                 }
             });
         }
