@@ -45,7 +45,7 @@ public class Events {
             Instance.Cache.UpdateAssist(@event.Assister);
         }
 
-        if (@event.Attacker != null)
+        if (@event.Attacker != null && @event.Attacker != @event.Userid)
         {
             Instance.Cache.UpdateKill(@event.Attacker);
         }
