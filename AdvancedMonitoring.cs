@@ -6,7 +6,7 @@ namespace AdvancedMonitoring;
 
 public class AdvancedMonitoring : BasePlugin, IPluginConfig<PluginConfig>
 {
-    public override string ModuleName => "AdvancedMonitoring";
+    public override string ModuleName => "[AdvancedMonitoring]";
     public override string ModuleAuthor => "Armatura";
     public override string ModuleVersion => "1.0.1";
 
