@@ -39,6 +39,35 @@ Config File located in **/addons/counterstrikesharp/configs/plugins/AdvancedMoni
 ``` sh
 curl -X GET http://server-ip:server-port/monitoringInfo/
 ```
+3. Response **json**
+``` json
+{
+    "Name": "Hostname",
+    "MapName": "map_name",
+    "MaxPlayers": 32,
+    "Port": 27015,
+    "TScore": 0,
+    "CTScore": 0,
+    "Players": [
+        {
+            "Name": "PlaerName",
+            "SteamID64": "123",
+            "SteamID32": "123",
+            "SteamID2": "STEAM_0:1:123",
+            "SteamID3": "[U:1:123]",
+            "Kills": 0,
+            "Deaths": 0,
+            "Supports": 0,
+            "Ping": 42,
+            "TeamName": "Spectator",
+            "PlayTime": 578,
+            "IsBot": false,
+            "IsHLTV": false,
+            "IsSpec": true
+        }
+    ]
+}
+```
 
 # Requirements:
 [CounterStrikeSharp](https://github.com/roflmuffin/CounterStrikeSharp) v236 or higher
