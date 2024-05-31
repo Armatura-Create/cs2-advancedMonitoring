@@ -7,6 +7,7 @@ public class ServerDto
     public int Port { get; set; }
     public string? IP { get; set; }
     public int MaxPlayers { get; set; }
+    public long TimeMap { get; set; }
     public int TScore { get; set; }
     public int CTScore { get; set; }
 

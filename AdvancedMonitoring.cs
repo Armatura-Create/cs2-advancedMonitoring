@@ -8,7 +8,7 @@ public class AdvancedMonitoring : BasePlugin, IPluginConfig<PluginConfig>
 {
     public override string ModuleName => "[AdvancedMonitoring]";
     public override string ModuleAuthor => "Armatura";
-    public override string ModuleVersion => "1.0.1";
+    public override string ModuleVersion => "1.0.2";
 
     public PluginConfig Config { get; set; } = new();
     public static AdvancedMonitoring Instance { get; set; } = new();

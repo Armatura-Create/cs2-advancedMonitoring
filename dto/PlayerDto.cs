@@ -7,10 +7,7 @@ public class PlayerDto
     public string? SteamID32 { get; set; }
     public string? SteamID2 { get; set; }
     public string? SteamID3 { get; set; }
-    public int Kills { get; set; }
-    public int Deaths { get; set; }
-    public int Assists { get; set; }
-    public int Score { get; set; }
+    public StatisticDto Statistic { get; set; } = new();
     public uint? Ping { get; set; }
     public string? TeamName { get; set; }
     public float? PlayTime { get; set; }

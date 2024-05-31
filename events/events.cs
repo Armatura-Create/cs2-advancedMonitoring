@@ -1,4 +1,7 @@
 using CounterStrikeSharp.API.Core;
+using CounterStrikeSharp.API.Modules.Memory;
+using CounterStrikeSharp.API.Modules.Memory.DynamicFunctions;
+using CounterStrikeSharp.API.Modules.Utils;
 using static AdvancedMonitoring.AdvancedMonitoring;
 
 namespace AdvancedMonitoring;
@@ -11,6 +14,7 @@ public class Events {
         Instance.RegisterEventHandler<EventPlayerConnect>(OnPlayerConnected);
         Instance.RegisterEventHandler<EventPlayerDisconnect>(OnPlayerDisconnected);
         Instance.RegisterEventHandler<EventPlayerDeath>(OnPlayerDeath);
+        Instance.RegisterEventHandler<EventPlayerHurt>(OnPlayerHurt);
     }
 
     private HookResult OnRoundEnd(EventRoundEnd @event, GameEventInfo info)
@@ -47,9 +51,27 @@ public class Events {
 
         if (@event.Attacker != null && @event.Attacker != @event.Userid)
         {
-            Instance.Cache.UpdateKill(@event.Attacker);
+            Instance.Cache.UpdateKill(@event.Attacker, @event.Headshot);
         }
         
+        return HookResult.Continue;
+    }
+
+    private HookResult OnPlayerHurt(EventPlayerHurt @event, GameEventInfo info)
+    {
+        CCSPlayerController? victim = @event.Userid;
+        if (victim == null || !victim.IsValid || !victim.PlayerPawn.IsValid)
+            return HookResult.Continue;
+
+        CCSPlayerController? attacker = @event.Attacker;
+        if (attacker == null || !attacker.IsValid || !attacker.PlayerPawn.IsValid)
+            return HookResult.Continue;
+
+        if (victim == attacker && victim.TeamNum != attacker.TeamNum)
+            return HookResult.Continue;
+            
+        Instance.Cache.UpdateDamage(attacker, @event.DmgHealth);
+
         return HookResult.Continue;
     }
 

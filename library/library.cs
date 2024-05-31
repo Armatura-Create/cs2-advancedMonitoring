@@ -9,7 +9,7 @@ public static class Library {
     {
         if (Instance.Config.Debug)
         {
-            Console.WriteLine($"[{Instance.ModuleName}] {message}");
+            Console.WriteLine($"{Instance.ModuleName} {message}");
         }
     }
 

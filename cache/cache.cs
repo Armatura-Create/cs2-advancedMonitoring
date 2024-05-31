@@ -55,7 +55,7 @@ public class Cache
             {
                 if (p.SteamID64 == player.AuthorizedSteamID?.SteamId64.ToString())
                 {
-                    p.Deaths++;
+                    p.Statistic.Deaths++;
                 }
             });
         }
@@ -75,13 +75,13 @@ public class Cache
             {
                 if (p.SteamID64 == player.AuthorizedSteamID?.SteamId64.ToString())
                 {
-                    p.Assists++;
+                    p.Statistic.Assists++;
                 }
             });
         }
     }
 
-    public void UpdateKill(CCSPlayerController? player)
+    public void UpdateKill(CCSPlayerController? player, bool headshot)
     {
         if (player == null)
         {
@@ -95,15 +95,39 @@ public class Cache
             {
                 if (p.SteamID64 == player.AuthorizedSteamID?.SteamId64.ToString())
                 {
-                    p.Kills++;
+                    p.Statistic.Kills++;
+                    if (headshot)
+                    {
+                        p.Statistic.Headshots++;
+                    }
+                }
+            });
+        }
+    }
+
+    public void UpdateDamage(CCSPlayerController? player, int damage)
+    {
+        if (player == null)
+        {
+            Library.PrintConsole("UpdateDamage Player is null.");
+            return;
+        }
+
+        lock (dataLock)
+        {
+            currentServerData.Players.ForEach(p =>
+            {
+                if (p.SteamID64 == player.AuthorizedSteamID?.SteamId64.ToString())
+                {
+                    p.Statistic.Damage += damage;
                 }
             });
         }
     }
 
     private void StartUpdateTimer(){
-        timeTimer = Instance.AddTimer(1.0f, () => UpdateTimePlayers(), TimerFlags.REPEAT | TimerFlags.STOP_ON_MAPCHANGE);
-        updateTimer = Instance.AddTimer(Instance.Config.MinIntervalUpdate, () => UpdateServerData(), TimerFlags.REPEAT);
+        timeTimer = Instance.AddTimer(1.0f, UpdateTimePlayers, TimerFlags.REPEAT | TimerFlags.STOP_ON_MAPCHANGE);
+        updateTimer = Instance.AddTimer(Instance.Config.MinIntervalUpdate, UpdateServerData, TimerFlags.REPEAT);
     }
 
     private void UpdateTimePlayers()
@@ -122,6 +146,8 @@ public class Cache
                         p.PlayTime++;
                     }
                 }
+
+                currentServerData.TimeMap = (long) Math.Round(Server.CurrentTime);
             }
         } catch (Exception ex) {
             Library.PrintConsole("Error updating time players: " + ex.Message);
@@ -138,26 +164,27 @@ public class Cache
 
         lock (dataLock)
         {
-            players.Add(new PlayerDto{
+            var p = new PlayerDto{
                 Name = player.PlayerName,
                 SteamID32 = player.AuthorizedSteamID?.SteamId32.ToString(),
                 SteamID64 = player.AuthorizedSteamID?.SteamId64.ToString(),
                 SteamID2 = player.AuthorizedSteamID?.SteamId2.ToString(),
                 SteamID3 = player.AuthorizedSteamID?.SteamId3.ToString(),
-                Kills = 0,
-                Deaths = 0,
-                Assists = 0,
-                Score = player.Score,
                 Ping = player.Ping,
                 TeamName = player.Team.ToString(),
                 PlayTime = 0,
                 IsBot = player.IsBot,
                 IsHLTV = player.IsHLTV,
                 IsSpec = player.Team.ToString().Equals("Spectator")
-            });
-        }
+            };
 
-        Library.PrintConsole("Player added.");
+            p.Statistic.Score = player.Score;
+
+            if (p.SteamID64 != null){
+                players.Add(p);
+                Library.PrintConsole("Player added.");
+            }
+        }
     }
 
     public void RemovePlayer(CCSPlayerController? player)
@@ -192,7 +219,7 @@ public class Cache
                     }
                     else
                     {
-                        playerData.Score = player.Score;
+                        playerData.Statistic.Score = player.Score;
                         playerData.Ping = player.Ping;
                         playerData.TeamName = player.Team.ToString();
                         playerData.IsSpec = player.Team.ToString().Equals("Spectator");

@@ -42,27 +42,32 @@ curl -X GET http://server-ip:server-port/monitoring-info/
 3. Response **json**
 ``` json
 {
-    "Name": "Hostname",
+    "Name": "HOSTNAME",
     "MapName": "map_name",
     "Port": 27015,
-    "IP" : "1.1.1.1",
-    "MaxPlayers": 32,
+    "IP": "1.1.1.1",
+    "MaxPlayers": 26,
+    "TimeMap": 366,
     "TScore": 0,
     "CTScore": 0,
     "Players": [
         {
-            "Name": "PlaerName",
+            "Name": "PlayerName",
             "SteamID64": "123",
             "SteamID32": "123",
             "SteamID2": "STEAM_0:1:123",
             "SteamID3": "[U:1:123]",
-            "Kills": 0,
-            "Deaths": 0,
-            "Assists": 0,
-            "Score": 0,
-            "Ping": 42,
+            "Statistic": {
+                "Kills": 0,
+                "Headshots": 0,
+                "Damage": 59,
+                "Deaths": 1,
+                "Assists": 0,
+                "Score": 0
+            },
+            "Ping": 41,
             "TeamName": "Spectator",
-            "PlayTime": 578,
+            "PlayTime": 167,
             "IsBot": false,
             "IsHLTV": false,
             "IsSpec": true
