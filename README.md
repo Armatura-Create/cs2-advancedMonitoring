@@ -36,7 +36,9 @@ Config File located in **/addons/counterstrikesharp/configs/plugins/AdvancedMoni
 
 1. Start the CS server with the plugin installed.
 2. Make a POST or GET request to the server to get the data:
+``` sh
 curl -X GET http://server-ip:server-port/monitoringInfo/
+```
 
 # Requirements:
 [CounterStrikeSharp](https://github.com/roflmuffin/CounterStrikeSharp) v236 or higher
