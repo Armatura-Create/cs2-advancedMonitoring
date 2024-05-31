@@ -47,13 +47,27 @@ public class HttpSupport {
             {
                 var context = await Listener.GetContextAsync();
                 Library.PrintConsole("Request from: " + context.Request.RemoteEndPoint?.Address);
-                ProcessRequest(context);
+                if (context.Request.HttpMethod == "GET" || context.Request.HttpMethod == "POST")
+                {
+                    ProcessRequest(context);
+                }
+                else
+                {
+                    SendError(context, HttpStatusCode.MethodNotAllowed, "Method Not Allowed - Only GET and POST are supported.");
+                }
             }
             catch (Exception ex)
             {
                 Library.PrintConsole("Error receiving request: " + ex.Message);
             }
         }
+    }
+
+    private void SendError(HttpListenerContext context, HttpStatusCode errorCode, string message)
+    {
+        context.Response.StatusCode = (int) errorCode;
+        context.Response.StatusDescription = message;
+        context.Response.Close();
     }
 
     private void ProcessRequest(HttpListenerContext context)
@@ -80,8 +94,7 @@ public class HttpSupport {
         catch (Exception ex)
         {
             Library.PrintConsole("Error processing request: " + ex.Message);
-            var errorString = "{\"error\": \"" + ex.Message + "\"}";
-            SendResponse(context, errorString);
+            SendError(context, HttpStatusCode.InternalServerError, ex.Message);
         }
     }
 
