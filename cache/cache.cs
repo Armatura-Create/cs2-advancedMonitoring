@@ -195,6 +195,7 @@ public class Cache
                         playerData.Score = player.Score;
                         playerData.Ping = player.Ping;
                         playerData.TeamName = player.Team.ToString();
+                        playerData.IsSpec = player.Team.ToString().Equals("Spectator");
                     }
                 }
             }
