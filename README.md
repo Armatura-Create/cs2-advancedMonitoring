@@ -37,7 +37,7 @@ Config File located in **/addons/counterstrikesharp/configs/plugins/AdvancedMoni
 1. Start the CS server with the plugin installed.
 2. Make a POST or GET request to the server to get the data:
 ``` sh
-curl -X GET http://server-ip:server-port/monitoringInfo/
+curl -X GET http://server-ip:server-port/monitoring-info/
 ```
 3. Response **json**
 ``` json
@@ -57,7 +57,8 @@ curl -X GET http://server-ip:server-port/monitoringInfo/
             "SteamID3": "[U:1:123]",
             "Kills": 0,
             "Deaths": 0,
-            "Supports": 0,
+            "Assists": 0,
+            "Score": 0,
             "Ping": 42,
             "TeamName": "Spectator",
             "PlayTime": 578,

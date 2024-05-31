@@ -23,6 +23,8 @@ public class HttpSupport {
 
         cts = new CancellationTokenSource();
 
+        Library.PrintConsole($"Starting HTTP server http://*:{port}/{endpoint}/");
+
         Listener = new HttpListener();
         Listener.Prefixes.Add($"http://*:{port}/{endpoint}/");
         Listener.Start();
@@ -60,6 +62,16 @@ public class HttpSupport {
         {
             ServerDto serverData = Instance.Cache.GetCurrentServerData();
 
+            if (!Instance.Config.ShowBots)
+            {
+                serverData.Players.RemoveAll(p => p.IsBot);
+            }
+            
+            if (!Instance.Config.ShowHLTV)
+            {
+                serverData.Players.RemoveAll(p => p.IsHLTV);
+            }
+
             var responseString = JsonSerializer.Serialize(serverData);
             Library.PrintConsole("Response: " + responseString);
 
@@ -86,11 +98,11 @@ public class HttpSupport {
 
 
     public void StopHttpListener()
-    {
-        cts?.Cancel();
-        
+    {   
         Listener?.Stop();
         Listener?.Close();
+
+        cts?.Cancel();
         
         Library.PrintConsole("HTTP server stopped.");
     }

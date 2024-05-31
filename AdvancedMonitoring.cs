@@ -45,13 +45,7 @@ public class AdvancedMonitoring : BasePlugin, IPluginConfig<PluginConfig>
         RegisterListener<Listeners.OnMapStart>(mapName =>
         {
 
-            Cache.Init(new ServerDto
-            {
-                Name = ConVar.Find("hostname")!.StringValue,
-                MaxPlayers = Server.MaxPlayers,
-                MapName = Server.MapName,
-                Port = ConVar.Find("hostport")!.GetPrimitiveValue<int>(),
-            });
+            InitCache();
 
             Server.ExecuteCommand("sv_hibernate_when_empty false");
 
@@ -59,20 +53,32 @@ public class AdvancedMonitoring : BasePlugin, IPluginConfig<PluginConfig>
         });
 
         if(hotReload) {
-            Cache.Init(new ServerDto
-            {
-                Name = ConVar.Find("hostname")!.StringValue,
-                MaxPlayers = Server.MaxPlayers,
-                MapName = Server.MapName,
-                Port = ConVar.Find("hostport")!.GetPrimitiveValue<int>(),
-            });
-    
+            InitCache();
+
             Library.PrintConsole("Hot reload completed. HTTP server stopped.");
 
             HttpSupport.StartHttpListener(Cache.GetCurrentServerData().Port, Config.Endpoint);
         }
     }
+    
+    private void InitCache()
+    {
+        var hostnameVar = ConVar.Find("hostname");
+        var portVar = ConVar.Find("hostport");
 
+        if (hostnameVar == null || portVar == null)
+        {
+            throw new InvalidOperationException("Required ConVars are not initialized.");
+        }
+
+        Cache.Init(new ServerDto
+        {
+            Name = hostnameVar.StringValue,
+            MaxPlayers = Server.MaxPlayers,
+            MapName = Server.MapName,
+            Port = portVar.GetPrimitiveValue<int>(),
+        });
+    }
     
     public override void Unload(bool hotReload)
     {

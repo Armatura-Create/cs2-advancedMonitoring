@@ -10,6 +10,8 @@ public class Events {
         Instance.RegisterEventHandler<EventRoundEnd>(OnRoundEnd);
         Instance.RegisterEventHandler<EventPlayerConnect>(OnPlayerConnected);
         Instance.RegisterEventHandler<EventPlayerDisconnect>(OnPlayerDisconnected);
+        Instance.RegisterEventHandler<EventPlayerDeath>(OnPlayerDeath);
+        
     }
 
     private HookResult OnRoundEnd(EventRoundEnd @event, GameEventInfo info)
@@ -23,14 +25,26 @@ public class Events {
 
     private HookResult OnPlayerConnected(EventPlayerConnect @event, GameEventInfo info)
     {
-        // Instance.Cache.addPlayer(@event.Player);
+        Instance.Cache.AddPlayer(@event.Userid);
 
         return HookResult.Continue;
     }
 
     private HookResult OnPlayerDisconnected(EventPlayerDisconnect @event, GameEventInfo info)
     {
-        // Instance.Cache.removePlayer(@event.Player);
+        Instance.Cache.RemovePlayer(@event.Userid);
+
+        return HookResult.Continue;
+    }
+
+    private HookResult OnPlayerDeath(EventPlayerDeath @event, GameEventInfo info)
+    {
+        Instance.Cache.UpdateDeath(@event.Userid);
+
+        if (@event.Attacker != null)
+        {
+            Instance.Cache.UpdateAssist(@event.Attacker);
+        }
 
         return HookResult.Continue;
     }
