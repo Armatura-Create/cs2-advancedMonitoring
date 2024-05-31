@@ -12,6 +12,7 @@ Config File located in **/addons/counterstrikesharp/configs/plugins/AdvancedMoni
 - interval update data
 - show bots
 - show hltv
+- access_friendly_fire - Count friendly damage (for DM server)
 
 # Config 
 **AdvancedMonitoring.json**
@@ -20,6 +21,7 @@ Config File located in **/addons/counterstrikesharp/configs/plugins/AdvancedMoni
 {
     "Endpoint": "monitoring-info",
     "MinIntervalUpdate": 30,
+    "AccessFriendlyDamage":false,
     "ShowBots": true,
     "ShowHLTV": true,
     "Debug": true

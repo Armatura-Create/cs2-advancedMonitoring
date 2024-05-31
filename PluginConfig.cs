@@ -9,6 +9,9 @@ public class PluginConfig : BasePluginConfig
     [JsonPropertyName("min_interval_update")]
     public int MinIntervalUpdate { get; set; } = 30;
 
+    [JsonPropertyName("access_friendly_damage")]
+    public bool AccessFriendlyDamage { get; set; } = false;
+
     [JsonPropertyName("show_bots")]
     public bool ShowBots { get; set; } = false;
 

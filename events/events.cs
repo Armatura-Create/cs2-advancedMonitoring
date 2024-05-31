@@ -68,7 +68,10 @@ public class Events {
         if (attacker == null || !attacker.IsValid || !attacker.PlayerPawn.IsValid)
             return HookResult.Continue;
 
-        if (victim == attacker && victim.TeamNum != attacker.TeamNum)
+        if (victim == attacker)
+            return HookResult.Continue;
+
+        if (!Instance.Config.AccessFriendlyDamage && victim.Team == attacker.Team)
             return HookResult.Continue;
             
         Instance.Cache.UpdateDamage(attacker, @event.DmgHealth);
