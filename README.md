@@ -3,7 +3,7 @@ AdvancedMonitoring is a plugin for the CS2
 server designed to monitor the server and player states using an HTTP API. The plugin provides information about the current server status, including the player list, through HTTP requests.
 
 # Installation
-1. Download the latest release of the plugin from this link [https://github.com/Armatura-Create/cs2-advancedMonitoring/releases].
+1. Download the latest release of the plugin from [this link](https://github.com/Armatura-Create/cs2-advancedMonitoring/releases).
 2. Extract the downloaded files to **/addons/counterstrikesharp/plugins/**
 
 # Features:
@@ -16,6 +16,7 @@ Config File located in **/addons/counterstrikesharp/configs/plugins/AdvancedMoni
 # Config 
 **AdvancedMonitoring.json**
 
+``` json
 {
     "Endpoint": "monitoring-info",
     "MinIntervalUpdate": 30,
@@ -23,6 +24,7 @@ Config File located in **/addons/counterstrikesharp/configs/plugins/AdvancedMoni
     "ShowHLTV": true,
     "Debug": true
 }
+```
 
 - Endpoint: The access point for HTTP requests.
 - MinIntervalUpdate: The minimum interval for server data updates in seconds.
@@ -34,7 +36,7 @@ Config File located in **/addons/counterstrikesharp/configs/plugins/AdvancedMoni
 
 1. Start the CS server with the plugin installed.
 2. Make a POST or GET request to the server to get the data:
-curl -X GET http://<server-ip>:<server-port>/monitoringInfo/
+curl -X GET http://server-ip:server-port/monitoringInfo/
 
 # Requirements:
 [CounterStrikeSharp](https://github.com/roflmuffin/CounterStrikeSharp) v236 or higher
