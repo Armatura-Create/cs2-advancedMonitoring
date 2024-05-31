@@ -11,7 +11,6 @@ public class Events {
         Instance.RegisterEventHandler<EventPlayerConnect>(OnPlayerConnected);
         Instance.RegisterEventHandler<EventPlayerDisconnect>(OnPlayerDisconnected);
         Instance.RegisterEventHandler<EventPlayerDeath>(OnPlayerDeath);
-        
     }
 
     private HookResult OnRoundEnd(EventRoundEnd @event, GameEventInfo info)

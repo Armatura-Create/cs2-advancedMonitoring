@@ -44,8 +44,9 @@ curl -X GET http://server-ip:server-port/monitoring-info/
 {
     "Name": "Hostname",
     "MapName": "map_name",
-    "MaxPlayers": 32,
     "Port": 27015,
+    "IP" : "1.1.1.1",
+    "MaxPlayers": 32,
     "TScore": 0,
     "CTScore": 0,
     "Players": [

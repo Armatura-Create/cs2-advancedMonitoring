@@ -65,8 +65,9 @@ public class AdvancedMonitoring : BasePlugin, IPluginConfig<PluginConfig>
     {
         var hostnameVar = ConVar.Find("hostname");
         var portVar = ConVar.Find("hostport");
+        var ipVar = ConVar.Find("ip");
 
-        if (hostnameVar == null || portVar == null)
+        if (hostnameVar == null || portVar == null || ipVar == null)
         {
             throw new InvalidOperationException("Required ConVars are not initialized.");
         }
@@ -76,6 +77,7 @@ public class AdvancedMonitoring : BasePlugin, IPluginConfig<PluginConfig>
             Name = hostnameVar.StringValue,
             MaxPlayers = Server.MaxPlayers,
             MapName = Server.MapName,
+            IP = ipVar?.StringValue,
             Port = portVar.GetPrimitiveValue<int>(),
         });
     }
