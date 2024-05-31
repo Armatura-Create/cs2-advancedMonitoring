@@ -44,7 +44,6 @@ public class AdvancedMonitoring : BasePlugin, IPluginConfig<PluginConfig>
         Events.Load();
         RegisterListener<Listeners.OnMapStart>(mapName =>
         {
-
             InitCache();
 
             Server.ExecuteCommand("sv_hibernate_when_empty false");
