@@ -41,11 +41,16 @@ public class Events {
     {
         Instance.Cache.UpdateDeath(@event.Userid);
 
-        if (@event.Attacker != null)
+        if (@event.Assister != null)
         {
-            Instance.Cache.UpdateAssist(@event.Attacker);
+            Instance.Cache.UpdateAssist(@event.Assister);
         }
 
+        if (@event.Attacker != null)
+        {
+            Instance.Cache.UpdateKill(@event.Attacker);
+        }
+        
         return HookResult.Continue;
     }
 

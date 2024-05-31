@@ -81,6 +81,26 @@ public class Cache
         }
     }
 
+    public void UpdateKill(CCSPlayerController? player)
+    {
+        if (player == null)
+        {
+            Library.PrintConsole("UpdateKill Player is null.");
+            return;
+        }
+
+        lock (dataLock)
+        {
+            currentServerData.Players.ForEach(p =>
+            {
+                if (p.SteamID64 == player.AuthorizedSteamID?.SteamId64.ToString())
+                {
+                    p.Kills++;
+                }
+            });
+        }
+    }
+
     private void StartUpdateTimer(){
         timeTimer = Instance.AddTimer(1.0f, () => UpdateTimePlayers(), TimerFlags.REPEAT | TimerFlags.STOP_ON_MAPCHANGE);
         updateTimer = Instance.AddTimer(Instance.Config.MinIntervalUpdate, () => UpdateServerData(), TimerFlags.REPEAT);
@@ -124,7 +144,7 @@ public class Cache
                 SteamID64 = player.AuthorizedSteamID?.SteamId64.ToString(),
                 SteamID2 = player.AuthorizedSteamID?.SteamId2.ToString(),
                 SteamID3 = player.AuthorizedSteamID?.SteamId3.ToString(),
-                Kills = player.Kills.Count,
+                Kills = 0,
                 Deaths = 0,
                 Assists = 0,
                 Score = player.Score,
@@ -172,7 +192,6 @@ public class Cache
                     }
                     else
                     {
-                        playerData.Kills = player.Kills.Count;
                         playerData.Score = player.Score;
                         playerData.Ping = player.Ping;
                         playerData.TeamName = player.Team.ToString();
