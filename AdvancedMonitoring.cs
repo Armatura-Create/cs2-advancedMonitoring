@@ -1,6 +1,7 @@
 ﻿using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Cvars;
+using CounterStrikeSharp.API.Modules.Timers;
 
 namespace AdvancedMonitoring; 
 
@@ -44,11 +45,16 @@ public class AdvancedMonitoring : BasePlugin, IPluginConfig<PluginConfig>
         Events.Load();
         RegisterListener<Listeners.OnMapStart>(mapName =>
         {
-            InitCache();
+            AddTimer(5.0f, () =>
+            {
+                InitCache();
 
-            Server.ExecuteCommand("sv_hibernate_when_empty false");
+                Server.ExecuteCommand("sv_hibernate_when_empty false");
 
-            HttpSupport.StartHttpListener(Cache.GetCurrentServerData().Port, Config.Endpoint);
+                HttpSupport.StartHttpListener(Cache.GetCurrentServerData().Port, Config.Endpoint);
+
+                Console.WriteLine("OnMapStart completed. HTTP server started.");
+            });            
         });
 
         if(hotReload) {
