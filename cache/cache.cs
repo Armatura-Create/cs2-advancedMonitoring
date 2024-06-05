@@ -213,7 +213,7 @@ public class Cache
 
     public void RemovePlayer(CCSPlayerController? player)
     {
-        if (player == null)
+        if (player == null || player.AuthorizedSteamID == null || player.AuthorizedSteamID?.SteamId64 == null)
         {
             Library.PrintConsole("RemovePlayer Player is null.");
             return;

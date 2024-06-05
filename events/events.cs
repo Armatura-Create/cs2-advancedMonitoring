@@ -29,6 +29,9 @@ public class Events {
 
     private HookResult OnPlayerConnected(EventPlayerConnect @event, GameEventInfo info)
     {
+        if (@event.Userid == null || !@event.Userid.IsValid || !@event.Userid.PlayerPawn.IsValid)
+            return HookResult.Continue;
+
         Instance.Cache.AddPlayer(@event.Userid);
 
         return HookResult.Continue;
@@ -36,6 +39,9 @@ public class Events {
 
     private HookResult OnPlayerDisconnected(EventPlayerDisconnect @event, GameEventInfo info)
     {
+        if (@event.Userid == null || !@event.Userid.IsValid || !@event.Userid.PlayerPawn.IsValid)
+            return HookResult.Continue;
+
         Instance.Cache.RemovePlayer(@event.Userid);
 
         return HookResult.Continue;
@@ -43,6 +49,9 @@ public class Events {
 
     private HookResult OnPlayerDeath(EventPlayerDeath @event, GameEventInfo info)
     {
+        if (@event.Userid == null || !@event.Userid.IsValid || !@event.Userid.PlayerPawn.IsValid)
+            return HookResult.Continue;
+            
         Instance.Cache.UpdateDeath(@event.Userid);
 
         if (@event.Assister != null)

@@ -21,7 +21,7 @@ Config File located in **/addons/counterstrikesharp/configs/plugins/AdvancedMoni
 {
     "Endpoint": "monitoring-info",
     "MinIntervalUpdate": 30,
-    "AccessFriendlyDamage":false,
+    "AccessFriendlyDamage": false,
     "ShowBots": true,
     "ShowHLTV": true,
     "Debug": true
