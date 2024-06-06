@@ -68,7 +68,10 @@ public class HttpSupport {
                 else
                 {
                     Library.PrintConsole("Too many requests from: " + clientIp);
-                    SendError(context, HttpStatusCode.TooManyRequests, "Too Many Requests - Please wait before sending another request.");
+
+                    RequestTimestamps.TryGetValue(clientIp!, out DateTime lastRequestTime);
+
+                    SendError(context, HttpStatusCode.TooManyRequests, $"Too Many Requests - Please wait {RequestInterval.TotalSeconds - (DateTime.UtcNow - lastRequestTime).TotalSeconds} seconds.");
                 }
             }
             catch (Exception ex)
