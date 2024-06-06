@@ -10,6 +10,9 @@ public class HttpSupport {
     private HttpListener? Listener = null;
     private CancellationTokenSource? cts = null;
 
+    private readonly Dictionary<string, DateTime> RequestTimestamps = [];
+    private readonly TimeSpan RequestInterval = TimeSpan.FromSeconds(5); // Интервал в секундах между запросами
+
     public void StartHttpListener(int port, string endpoint) {
         if (!HttpListener.IsSupported) 
         {
@@ -43,17 +46,29 @@ public class HttpSupport {
                 Library.PrintConsole("Listener is null.");
                 return;
             }
-            try
+             try
             {
                 var context = await Listener.GetContextAsync();
-                Library.PrintConsole("Request from: " + context.Request.RemoteEndPoint?.Address);
-                if (context.Request.HttpMethod == "GET" || context.Request.HttpMethod == "POST")
+                var clientIp = context.Request.RemoteEndPoint?.Address.ToString();
+
+                
+                
+                if (IsRequestAllowed(clientIp))
                 {
-                    ProcessRequest(context);
+                    Library.PrintConsole("Request from: " + clientIp);
+                    if (context.Request.HttpMethod == "GET" || context.Request.HttpMethod == "POST")
+                    {
+                        ProcessRequest(context);
+                    }
+                    else
+                    {
+                        SendError(context, HttpStatusCode.MethodNotAllowed, "Method Not Allowed - Only GET and POST are supported.");
+                    }
                 }
                 else
                 {
-                    SendError(context, HttpStatusCode.MethodNotAllowed, "Method Not Allowed - Only GET and POST are supported.");
+                    Library.PrintConsole("Too many requests from: " + clientIp);
+                    SendError(context, HttpStatusCode.TooManyRequests, "Too Many Requests - Please wait before sending another request.");
                 }
             }
             catch (Exception ex)
@@ -107,6 +122,25 @@ public class HttpSupport {
         using var output = context.Response.OutputStream;
         output.Write(Encoding.UTF8.GetBytes(responseString));
         context.Response.Close();
+    }
+
+    private bool IsRequestAllowed(string? clientIp)
+    {
+        if (string.IsNullOrEmpty(clientIp))
+        {
+            return false;
+        }
+
+        if (RequestTimestamps.TryGetValue(clientIp, out DateTime lastRequestTime))
+        {
+            if (DateTime.UtcNow - lastRequestTime < RequestInterval)
+            {
+                return false;
+            }
+        }
+
+        RequestTimestamps[clientIp] = DateTime.UtcNow;
+        return true;
     }
 
 
