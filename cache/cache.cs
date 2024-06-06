@@ -189,7 +189,7 @@ public class Cache
         lock (dataLock)
         {
             var p = new PlayerDto{
-                Name = player.PlayerName,
+                Name = (player.IsBot ? "[BOT] " : player.IsHLTV ? "[HLTV] " : "") + player.PlayerName,
                 SteamID32 = player.AuthorizedSteamID?.SteamId32.ToString(),
                 SteamID64 = player.AuthorizedSteamID?.SteamId64.ToString(),
                 SteamID2 = player.AuthorizedSteamID?.SteamId2.ToString(),

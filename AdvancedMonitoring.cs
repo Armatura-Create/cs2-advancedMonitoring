@@ -9,7 +9,7 @@ public class AdvancedMonitoring : BasePlugin, IPluginConfig<PluginConfig>
 {
     public override string ModuleName => "[AdvancedMonitoring]";
     public override string ModuleAuthor => "Armatura";
-    public override string ModuleVersion => "1.0.4";
+    public override string ModuleVersion => "1.0.5";
 
     public PluginConfig Config { get; set; } = new();
     public static AdvancedMonitoring Instance { get; set; } = new();
@@ -53,7 +53,7 @@ public class AdvancedMonitoring : BasePlugin, IPluginConfig<PluginConfig>
 
                 HttpSupport.StartHttpListener(Cache.GetCurrentServerData().Port, Config.Endpoint);
 
-                Console.WriteLine("OnMapStart completed. HTTP server started.");
+                Console.WriteLine($"{ModuleName} Inited.");
             });            
         });
 
