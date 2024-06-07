@@ -9,7 +9,7 @@ public class Cache
 {
     private ServerDto currentServerData = new();
     private readonly object dataLock = new();
-    private readonly List<PlayerDto> players = new();
+    private readonly List<PlayerDto> players = [];
     private CounterStrikeSharp.API.Modules.Timers.Timer? timeTimer = null;
     private CounterStrikeSharp.API.Modules.Timers.Timer? updateTimer = null;
 
@@ -53,7 +53,7 @@ public class Cache
         {
             currentServerData.Players.ForEach(p =>
             {
-                if (p.SteamID64 == player.AuthorizedSteamID?.SteamId64.ToString())
+                if (p.SteamID64 == Library.GetSteamID(player, Library.TypeSteamId.SteamID64))
                 {
                     p.Statistic.Deaths++;
                 }
@@ -73,7 +73,7 @@ public class Cache
         {
             currentServerData.Players.ForEach(p =>
             {
-                if (p.SteamID64 == player.AuthorizedSteamID?.SteamId64.ToString())
+                if (p.SteamID64 == Library.GetSteamID(player, Library.TypeSteamId.SteamID64))
                 {
                     p.Statistic.Assists++;
                 }
@@ -93,7 +93,7 @@ public class Cache
         {
             currentServerData.Players.ForEach(p =>
             {
-                if (p.SteamID64 == player.AuthorizedSteamID?.SteamId64.ToString())
+               if (p.SteamID64 == Library.GetSteamID(player, Library.TypeSteamId.SteamID64))
                 {
                     p.Statistic.Kills++;
                     if (headshot)
@@ -121,7 +121,7 @@ public class Cache
         {
             currentServerData.Players.ForEach(p =>
             {
-                if (p.SteamID64 == player.AuthorizedSteamID?.SteamId64.ToString())
+                if (p.SteamID64 == Library.GetSteamID(player, Library.TypeSteamId.SteamID64))
                 {
                     p.Statistic.Shoots++;
                 }
@@ -141,7 +141,7 @@ public class Cache
         {
             currentServerData.Players.ForEach(p =>
             {
-                if (p.SteamID64 == player.AuthorizedSteamID?.SteamId64.ToString())
+                if (p.SteamID64 == Library.GetSteamID(player, Library.TypeSteamId.SteamID64))
                 {
                     p.Statistic.Damage += damage;
                 }
@@ -159,11 +159,11 @@ public class Cache
         try {
             lock (dataLock)
             {
-                var currentPlayers = Utilities.GetPlayers().Where(p => p.Connected == PlayerConnectedState.PlayerConnected && p.AuthorizedSteamID != null).ToList();
+                var currentPlayers = Utilities.GetPlayers().Where(p => p.Connected == PlayerConnectedState.PlayerConnected).ToList();
 
                 foreach (var player in currentPlayers)
                 {
-                    var p = players.Find(p => p.SteamID64 == player.AuthorizedSteamID?.SteamId64.ToString());
+                    var p = players.Find(p => p.SteamID64 == Library.GetSteamID(player, Library.TypeSteamId.SteamID64));
 
                     if (p != null)
                     {
@@ -191,10 +191,10 @@ public class Cache
             var p = new PlayerDto 
             {
                 Name = (player.IsBot ? "[BOT] " : player.IsHLTV ? "[HLTV] " : "") + player.PlayerName,
-                SteamID32 = player.IsBot ? "BOT-" + player.Slot : player.IsHLTV ? "HLTV-" + player.Slot : player.AuthorizedSteamID?.SteamId32.ToString(),
-                SteamID64 = player.IsBot ? "BOT-" + player.Slot : player.IsHLTV ? "HLTV-" + player.Slot : player.AuthorizedSteamID?.SteamId64.ToString(),
-                SteamID2 = player.IsBot ? "BOT-" + player.Slot : player.IsHLTV ? "HLTV-" + player.Slot : player.AuthorizedSteamID?.SteamId2.ToString(),
-                SteamID3 = player.IsBot ? "BOT-" + player.Slot : player.IsHLTV ? "HLTV-" + player.Slot :  player.AuthorizedSteamID?.SteamId3.ToString(),
+                SteamID32 = Library.GetSteamID(player, Library.TypeSteamId.SteamID32),
+                SteamID64 = Library.GetSteamID(player, Library.TypeSteamId.SteamID64),
+                SteamID2 = Library.GetSteamID(player, Library.TypeSteamId.SteamID2),
+                SteamID3 = Library.GetSteamID(player, Library.TypeSteamId.SteamID3),
                 Ping = player.IsBot || player.IsHLTV? 0 : player.Ping,
                 TeamName = player.Team.ToString(),
                 PlayTime = 0,
@@ -215,7 +215,7 @@ public class Cache
 
     public void RemovePlayer(CCSPlayerController? player)
     {
-        if (player == null || player.AuthorizedSteamID == null || player.AuthorizedSteamID?.SteamId64 == null)
+        if (player == null)
         {
             Library.PrintConsole("RemovePlayer Player is null.");
             return;
@@ -223,7 +223,11 @@ public class Cache
 
         lock (dataLock)
         {
-            players.RemoveAt(players.FindIndex(p => p.SteamID64 == player.AuthorizedSteamID?.SteamId64.ToString()));
+            var steamID64 = Library.GetSteamID(player, Library.TypeSteamId.SteamID64);
+            if (steamID64 != null)
+            {
+                players.RemoveAt(players.FindIndex(p => p.SteamID64 == steamID64));
+            }
         }
 
         Library.PrintConsole("Player removed.");
@@ -238,7 +242,7 @@ public class Cache
                 var currentPlayers = Utilities.GetPlayers().Where(p => p.Connected == PlayerConnectedState.PlayerConnected).ToList();
                 foreach (var player in currentPlayers)
                 {
-                    var playerData = players.Find(p => p.SteamID64 == (player.IsBot ? "BOT-" + player.Slot : player.IsHLTV ? "HLTV-" + player.Slot :  player.AuthorizedSteamID?.SteamId3.ToString()));
+                    var playerData = players.Find(p => p.SteamID64 == Library.GetSteamID(player, Library.TypeSteamId.SteamID64));
 
                     if (playerData == null)
                     {
@@ -254,7 +258,7 @@ public class Cache
                 }
 
                 //Remove players that disconnected
-                players.RemoveAll(p => currentPlayers.All(cp => (cp.IsBot ? "BOT-" + cp.Slot : cp.IsHLTV ? "HLTV-" + cp.Slot :  cp.AuthorizedSteamID?.SteamId3.ToString()) != p.SteamID64));
+                players.RemoveAll(p => currentPlayers.All(cp => Library.GetSteamID(cp, Library.TypeSteamId.SteamID64) != p.SteamID64));
             }
 
             Library.PrintConsole("Server data updated.");

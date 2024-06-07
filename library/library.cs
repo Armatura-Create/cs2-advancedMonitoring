@@ -29,4 +29,34 @@ public static class Library {
             }
         }
     }
+
+    public static string? GetSteamID(CCSPlayerController? player, TypeSteamId type)
+    {
+        if (player == null)
+        {
+            return null;
+        }
+
+        if (player.IsHLTV || player.IsBot)
+        {
+            return player.IsBot ? "BOT-" + player.Slot : "HLTV-" + player.Slot;
+        }
+
+        return type switch
+        {
+            TypeSteamId.SteamID64 => player.AuthorizedSteamID?.SteamId64.ToString(),
+            TypeSteamId.SteamID32 => player.AuthorizedSteamID?.SteamId32.ToString(),
+            TypeSteamId.SteamID2 => player.AuthorizedSteamID?.SteamId2.ToString(),
+            TypeSteamId.SteamID3 => player.AuthorizedSteamID?.SteamId3.ToString(),
+            _ => null,
+        };
+    }
+
+    public enum TypeSteamId
+    {
+        SteamID64,
+        SteamID32,
+        SteamID2,
+        SteamID3
+    }
 }
