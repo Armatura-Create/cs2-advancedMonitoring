@@ -5,7 +5,7 @@ using static AdvancedMonitoring.AdvancedMonitoring;
 namespace AdvancedMonitoring;
 
 public static class Library {
-    public static void PrintConsole(string message)
+    public static void PrintConsole(string? message)
     {
         if (Instance.Config.Debug)
         {

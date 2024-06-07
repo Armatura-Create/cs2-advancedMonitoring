@@ -188,13 +188,14 @@ public class Cache
 
         lock (dataLock)
         {
-            var p = new PlayerDto{
+            var p = new PlayerDto 
+            {
                 Name = (player.IsBot ? "[BOT] " : player.IsHLTV ? "[HLTV] " : "") + player.PlayerName,
-                SteamID32 = player.AuthorizedSteamID?.SteamId32.ToString(),
-                SteamID64 = player.AuthorizedSteamID?.SteamId64.ToString(),
-                SteamID2 = player.AuthorizedSteamID?.SteamId2.ToString(),
-                SteamID3 = player.AuthorizedSteamID?.SteamId3.ToString(),
-                Ping = player.Ping,
+                SteamID32 = player.IsBot ? "BOT-" + player.Slot : player.IsHLTV ? "HLTV-" + player.Slot : player.AuthorizedSteamID?.SteamId32.ToString(),
+                SteamID64 = player.IsBot ? "BOT-" + player.Slot : player.IsHLTV ? "HLTV-" + player.Slot : player.AuthorizedSteamID?.SteamId64.ToString(),
+                SteamID2 = player.IsBot ? "BOT-" + player.Slot : player.IsHLTV ? "HLTV-" + player.Slot : player.AuthorizedSteamID?.SteamId2.ToString(),
+                SteamID3 = player.IsBot ? "BOT-" + player.Slot : player.IsHLTV ? "HLTV-" + player.Slot :  player.AuthorizedSteamID?.SteamId3.ToString(),
+                Ping = player.IsBot || player.IsHLTV? 0 : player.Ping,
                 TeamName = player.Team.ToString(),
                 PlayTime = 0,
                 IsBot = player.IsBot,
@@ -204,7 +205,8 @@ public class Cache
 
             p.Statistic.Score = player.Score;
 
-            if (p.SteamID64 != null){
+            if (p.SteamID64 != null)
+            {
                 players.Add(p);
                 Library.PrintConsole("Player added.");
             }
@@ -233,9 +235,10 @@ public class Cache
         {
             lock (dataLock)
             {
-                foreach (var player in Utilities.GetPlayers().Where(p => p.Connected == PlayerConnectedState.PlayerConnected && p.AuthorizedSteamID != null))
+                var currentPlayers = Utilities.GetPlayers().Where(p => p.Connected == PlayerConnectedState.PlayerConnected).ToList();
+                foreach (var player in currentPlayers)
                 {
-                    var playerData = players.Find(p => p.SteamID64 == player.AuthorizedSteamID?.SteamId64.ToString());
+                    var playerData = players.Find(p => p.SteamID64 == (player.IsBot ? "BOT-" + player.Slot : player.IsHLTV ? "HLTV-" + player.Slot :  player.AuthorizedSteamID?.SteamId3.ToString()));
 
                     if (playerData == null)
                     {
@@ -249,6 +252,9 @@ public class Cache
                         playerData.IsSpec = player.Team.ToString().Equals("Spectator");
                     }
                 }
+
+                //Remove players that disconnected
+                players.RemoveAll(p => currentPlayers.All(cp => (cp.IsBot ? "BOT-" + cp.Slot : cp.IsHLTV ? "HLTV-" + cp.Slot :  cp.AuthorizedSteamID?.SteamId3.ToString()) != p.SteamID64));
             }
 
             Library.PrintConsole("Server data updated.");
