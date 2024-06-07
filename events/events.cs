@@ -29,9 +29,6 @@ public class Events {
 
     private HookResult OnPlayerConnected(EventPlayerConnect @event, GameEventInfo info)
     {
-        if (@event.Userid == null || !@event.Userid.IsValid || !@event.Userid.PlayerPawn.IsValid)
-            return HookResult.Continue;
-
         Instance.Cache.AddPlayer(@event.Userid);
 
         return HookResult.Continue;
@@ -39,9 +36,6 @@ public class Events {
 
     private HookResult OnPlayerDisconnected(EventPlayerDisconnect @event, GameEventInfo info)
     {
-        if (@event.Userid == null || !@event.Userid.IsValid || !@event.Userid.PlayerPawn.IsValid)
-            return HookResult.Continue;
-
         Instance.Cache.RemovePlayer(@event.Userid);
 
         return HookResult.Continue;
@@ -49,15 +43,9 @@ public class Events {
 
     private HookResult OnPlayerDeath(EventPlayerDeath @event, GameEventInfo info)
     {
-        if (@event.Userid == null || !@event.Userid.IsValid || !@event.Userid.PlayerPawn.IsValid)
-            return HookResult.Continue;
-            
         Instance.Cache.UpdateDeath(@event.Userid);
-
-        if (@event.Assister != null)
-        {
-            Instance.Cache.UpdateAssist(@event.Assister);
-        }
+       
+        Instance.Cache.UpdateAssist(@event.Assister);
 
         if (@event.Attacker != null && @event.Attacker != @event.Userid)
         {
@@ -70,17 +58,12 @@ public class Events {
     private HookResult OnPlayerHurt(EventPlayerHurt @event, GameEventInfo info)
     {
         CCSPlayerController? victim = @event.Userid;
-        if (victim == null || !victim.IsValid || !victim.PlayerPawn.IsValid)
-            return HookResult.Continue;
-
         CCSPlayerController? attacker = @event.Attacker;
-        if (attacker == null || !attacker.IsValid || !attacker.PlayerPawn.IsValid)
-            return HookResult.Continue;
 
         if (victim == attacker)
             return HookResult.Continue;
 
-        if (!Instance.Config.AccessFriendlyDamage && victim.Team == attacker.Team)
+        if (!Instance.Config.AccessFriendlyDamage && victim?.Team == attacker?.Team)
             return HookResult.Continue;
             
         Instance.Cache.UpdateDamage(attacker, @event.DmgHealth);
@@ -90,11 +73,7 @@ public class Events {
 
     private HookResult OnPlayerShoot(EventPlayerShoot @event, GameEventInfo info)
     {
-        CCSPlayerController? player = @event.Userid;
-        if (player == null || !player.IsValid || !player.PlayerPawn.IsValid)
-            return HookResult.Continue;
-
-        Instance.Cache.UpdateCountShoots(player);
+        Instance.Cache.UpdateCountShoots(@event.Userid);
 
         return HookResult.Continue;
     }
