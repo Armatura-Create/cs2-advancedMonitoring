@@ -3,6 +3,7 @@ namespace AdvancedMonitoring;
 public class PlayerDto
 {
     public string? Name { get; set; }
+    public int Slot { get; set; }
     public string? SteamID64 { get; set; }
     public string? SteamID32 { get; set; }
     public string? SteamID2 { get; set; }

@@ -41,11 +41,12 @@ public class Cache
         }
     }
 
-    public void UpdateDeath(CCSPlayerController? player)
+    public void UpdateCache(CCSPlayerController? player, TypeUpdate type, object? value)
     {
-        if (player == null)
+        var steamID64 = Library.GetSteamID(player, Library.TypeSteamId.SteamID64);
+        if (steamID64 == null)
         {
-            Library.PrintConsole("UpdateDeath Player is null.");
+            Library.PrintConsole("UpdateCache SteamID64 is null.");
             return;
         }
 
@@ -53,97 +54,33 @@ public class Cache
         {
             currentServerData.Players.ForEach(p =>
             {
-                if (p.SteamID64 == Library.GetSteamID(player, Library.TypeSteamId.SteamID64))
+                if (p.SteamID64 == steamID64)
                 {
-                    p.Statistic.Deaths++;
-                }
-            });
-        }
-    }
-
-    public void UpdateAssist(CCSPlayerController? player)
-    {
-        if (player == null)
-        {
-            Library.PrintConsole("UpdateAssist Player is null.");
-            return;
-        }
-
-        lock (dataLock)
-        {
-            currentServerData.Players.ForEach(p =>
-            {
-                if (p.SteamID64 == Library.GetSteamID(player, Library.TypeSteamId.SteamID64))
-                {
-                    p.Statistic.Assists++;
-                }
-            });
-        }
-    }
-
-    public void UpdateKill(CCSPlayerController? player, bool headshot, string weapon)
-    {
-        if (player == null)
-        {
-            Library.PrintConsole("UpdateKill Player is null.");
-            return;
-        }
-
-        lock (dataLock)
-        {
-            currentServerData.Players.ForEach(p =>
-            {
-               if (p.SteamID64 == Library.GetSteamID(player, Library.TypeSteamId.SteamID64))
-                {
-                    p.Statistic.Kills++;
-                    if (headshot)
+                    switch (type)
                     {
-                        p.Statistic.Headshots++;
+                        case TypeUpdate.Kill:
+                            p.Statistic.Kills++;
+                            break;
+                        case TypeUpdate.KillKnife:
+                            p.Statistic.KnifeKills++;
+                            break;
+                        case TypeUpdate.Assist:
+                            p.Statistic.Assists++;
+                            break;
+                        case TypeUpdate.Death:
+                            p.Statistic.Deaths++;
+                            break;
+                        case TypeUpdate.Shoots:
+                            p.Statistic.Shoots++;
+                            break;
+                        case TypeUpdate.Damage:
+                            p.Statistic.Damage += (int) value!;
+                            break;
+                        case TypeUpdate.Headshot:
+                            p.Statistic.Headshots++;
+                            break;
+                        
                     }
-                    if (weapon.Contains("knife"))
-                    {
-                        p.Statistic.KnifeKills++;
-                    }
-                }
-            });
-        }
-    }
-
-    public void UpdateCountShoots(CCSPlayerController? player)
-    {
-        if (player == null)
-        {
-            Library.PrintConsole("UpdateCountShoots Player is null.");
-            return;
-        }
-
-        lock (dataLock)
-        {
-            currentServerData.Players.ForEach(p =>
-            {
-                if (p.SteamID64 == Library.GetSteamID(player, Library.TypeSteamId.SteamID64))
-                {
-                    p.Statistic.Shoots++;
-                }
-            });
-        }
-    }
-
-    public void UpdateDamage(CCSPlayerController? player, int damage)
-    {
-        if (player == null)
-        {
-            Library.PrintConsole("UpdateDamage Player is null.");
-            return;
-        }
-
-        lock (dataLock)
-        {
-            currentServerData.Players.ForEach(p =>
-            {
-                if (p.SteamID64 == Library.GetSteamID(player, Library.TypeSteamId.SteamID64))
-                {
-                    p.Statistic.Damage += damage;
                 }
             });
         }
@@ -163,7 +100,14 @@ public class Cache
 
                 foreach (var player in currentPlayers)
                 {
-                    var p = players.Find(p => p.SteamID64 == Library.GetSteamID(player, Library.TypeSteamId.SteamID64));
+                    var steamID64 = Library.GetSteamID(player, Library.TypeSteamId.SteamID64);
+
+                    if (steamID64 == null)
+                    {
+                        continue;
+                    }
+                    
+                    var p = players.Find(p => p.SteamID64 == steamID64);
 
                     if (p != null)
                     {
@@ -191,6 +135,7 @@ public class Cache
             var p = new PlayerDto 
             {
                 Name = (player.IsBot ? "[BOT] " : player.IsHLTV ? "[HLTV] " : "") + player.PlayerName,
+                Slot = player.Slot,
                 SteamID32 = Library.GetSteamID(player, Library.TypeSteamId.SteamID32),
                 SteamID64 = Library.GetSteamID(player, Library.TypeSteamId.SteamID64),
                 SteamID2 = Library.GetSteamID(player, Library.TypeSteamId.SteamID2),
@@ -215,22 +160,17 @@ public class Cache
 
     public void RemovePlayer(CCSPlayerController? player)
     {
-        if (player == null)
-        {
-            Library.PrintConsole("RemovePlayer Player is null.");
-            return;
-        }
-
         lock (dataLock)
         {
             var steamID64 = Library.GetSteamID(player, Library.TypeSteamId.SteamID64);
             if (steamID64 != null)
             {
                 players.RemoveAt(players.FindIndex(p => p.SteamID64 == steamID64));
+                Library.PrintConsole("Player removed.");
+            } else {
+                Library.PrintConsole("RemovePlayer SteamID64 is null.");
             }
         }
-
-        Library.PrintConsole("Player removed.");
     }
 
     private void UpdateServerData()
@@ -286,4 +226,14 @@ public class Cache
 
         Library.PrintConsole("Cache unloaded.");
     }
+}
+
+public enum TypeUpdate {
+    Kill,
+    KillKnife,
+    Headshot,
+    Assist,
+    Death,
+    Shoots,
+    Damage
 }

@@ -37,11 +37,11 @@ public static class Library {
             return null;
         }
 
-        if (player.IsHLTV || player.IsBot)
+        if ((player.IsHLTV && Instance.Config.ShowHLTV) || (player.IsBot && Instance.Config.ShowBots))
         {
             return player.IsBot ? "BOT-" + player.Slot : "HLTV-" + player.Slot;
         }
-
+        
         return type switch
         {
             TypeSteamId.SteamID64 => player.AuthorizedSteamID?.SteamId64.ToString(),

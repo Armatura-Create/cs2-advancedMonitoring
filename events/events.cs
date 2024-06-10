@@ -43,13 +43,19 @@ public class Events {
 
     private HookResult OnPlayerDeath(EventPlayerDeath @event, GameEventInfo info)
     {
-        Instance.Cache.UpdateDeath(@event.Userid);
+        Instance.Cache.UpdateCache(@event.Userid, TypeUpdate.Death, null);
        
-        Instance.Cache.UpdateAssist(@event.Assister);
+        Instance.Cache.UpdateCache(@event.Assister, TypeUpdate.Assist, null);
 
         if (@event.Attacker != null && @event.Attacker != @event.Userid)
         {
-            Instance.Cache.UpdateKill(@event.Attacker, @event.Headshot, @event.Weapon);
+            Instance.Cache.UpdateCache(@event.Attacker, TypeUpdate.Kill, null);
+            if (@event.Headshot){
+                Instance.Cache.UpdateCache(@event.Attacker, TypeUpdate.Headshot, null);
+            }
+            if (@event.Weapon == "knife"){
+                Instance.Cache.UpdateCache(@event.Attacker, TypeUpdate.KillKnife, null);
+            }
         }
         
         return HookResult.Continue;
@@ -60,20 +66,23 @@ public class Events {
         CCSPlayerController? victim = @event.Userid;
         CCSPlayerController? attacker = @event.Attacker;
 
+        if (victim == null || attacker == null)
+            return HookResult.Continue;
+
         if (victim == attacker)
             return HookResult.Continue;
 
         if (!Instance.Config.AccessFriendlyDamage && victim?.Team == attacker?.Team)
             return HookResult.Continue;
             
-        Instance.Cache.UpdateDamage(attacker, @event.DmgHealth);
+        Instance.Cache.UpdateCache(attacker, TypeUpdate.Damage, @event.DmgHealth);
 
         return HookResult.Continue;
     }
 
     private HookResult OnPlayerShoot(EventPlayerShoot @event, GameEventInfo info)
     {
-        Instance.Cache.UpdateCountShoots(@event.Userid);
+        Instance.Cache.UpdateCache(@event.Userid, TypeUpdate.Shoots, null);
 
         return HookResult.Continue;
     }
