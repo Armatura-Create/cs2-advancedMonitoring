@@ -41,6 +41,11 @@ public class Cache
         }
     }
 
+    public void UpdateCache(CCSPlayerController? player, TypeUpdate type)
+    {
+        UpdateCache(player, type, null);
+    }
+
     public void UpdateCache(CCSPlayerController? player, TypeUpdate type, object? value)
     {
         var steamID64 = Library.GetSteamID(player, Library.TypeSteamId.SteamID64);
@@ -79,7 +84,9 @@ public class Cache
                         case TypeUpdate.Headshot:
                             p.Statistic.Headshots++;
                             break;
-                        
+                        case TypeUpdate.Time:
+                            p.PlayTime++;
+                            break;
                     }
                 }
             });
@@ -94,31 +101,52 @@ public class Cache
     private void UpdateTimePlayers()
     {
         try {
+            var currentPlayers = Utilities.GetPlayers().Where(p => p.Connected == PlayerConnectedState.PlayerConnected).ToList();
+
+            foreach (var player in currentPlayers)
+            {   
+                UpdateCache(player, TypeUpdate.Time, null);
+            }
+
+            currentServerData.TimeMap = (long) Math.Round(Server.CurrentTime);
+        } catch (Exception ex) {
+            Library.PrintConsole("Error updating time players: " + ex.Message);
+        }
+    }
+
+    private void UpdateServerData()
+    {
+        try
+        {
             lock (dataLock)
             {
                 var currentPlayers = Utilities.GetPlayers().Where(p => p.Connected == PlayerConnectedState.PlayerConnected).ToList();
-
                 foreach (var player in currentPlayers)
                 {
-                    var steamID64 = Library.GetSteamID(player, Library.TypeSteamId.SteamID64);
+                    var playerData = players.Find(p => p.SteamID64 == Library.GetSteamID(player, Library.TypeSteamId.SteamID64));
 
-                    if (steamID64 == null)
+                    if (playerData == null)
                     {
-                        continue;
+                        AddPlayer(player);
                     }
-                    
-                    var p = players.Find(p => p.SteamID64 == steamID64);
-
-                    if (p != null)
+                    else
                     {
-                        p.PlayTime++;
+                        playerData.Statistic.Score = player.Score;
+                        playerData.Ping = player.Ping;
+                        playerData.TeamName = player.Team.ToString();
+                        playerData.IsSpec = player.Team.ToString().Equals("Spectator");
                     }
                 }
 
-                currentServerData.TimeMap = (long) Math.Round(Server.CurrentTime);
+                //Remove players that disconnected
+                players.RemoveAll(p => currentPlayers.All(cp => Library.GetSteamID(cp, Library.TypeSteamId.SteamID64) != p.SteamID64));
             }
-        } catch (Exception ex) {
-            Library.PrintConsole("Error updating time players: " + ex.Message);
+
+            Library.PrintConsole("Server data updated.");
+        }
+        catch (Exception ex)
+        {
+            Library.PrintConsole("Error updating server data: " + ex.Message);
         }
     }
 
@@ -173,42 +201,6 @@ public class Cache
         }
     }
 
-    private void UpdateServerData()
-    {
-        try
-        {
-            lock (dataLock)
-            {
-                var currentPlayers = Utilities.GetPlayers().Where(p => p.Connected == PlayerConnectedState.PlayerConnected).ToList();
-                foreach (var player in currentPlayers)
-                {
-                    var playerData = players.Find(p => p.SteamID64 == Library.GetSteamID(player, Library.TypeSteamId.SteamID64));
-
-                    if (playerData == null)
-                    {
-                        AddPlayer(player);
-                    }
-                    else
-                    {
-                        playerData.Statistic.Score = player.Score;
-                        playerData.Ping = player.Ping;
-                        playerData.TeamName = player.Team.ToString();
-                        playerData.IsSpec = player.Team.ToString().Equals("Spectator");
-                    }
-                }
-
-                //Remove players that disconnected
-                players.RemoveAll(p => currentPlayers.All(cp => Library.GetSteamID(cp, Library.TypeSteamId.SteamID64) != p.SteamID64));
-            }
-
-            Library.PrintConsole("Server data updated.");
-        }
-        catch (Exception ex)
-        {
-            Library.PrintConsole("Error updating server data: " + ex.Message);
-        }
-    }
-
     public ServerDto GetCurrentServerData()
     {
         lock (dataLock)
@@ -235,5 +227,6 @@ public enum TypeUpdate {
     Assist,
     Death,
     Shoots,
-    Damage
+    Damage,
+    Time
 }

@@ -1,7 +1,4 @@
 using CounterStrikeSharp.API.Core;
-using CounterStrikeSharp.API.Modules.Memory;
-using CounterStrikeSharp.API.Modules.Memory.DynamicFunctions;
-using CounterStrikeSharp.API.Modules.Utils;
 using static AdvancedMonitoring.AdvancedMonitoring;
 
 namespace AdvancedMonitoring;
@@ -43,18 +40,18 @@ public class Events {
 
     private HookResult OnPlayerDeath(EventPlayerDeath @event, GameEventInfo info)
     {
-        Instance.Cache.UpdateCache(@event.Userid, TypeUpdate.Death, null);
+        Instance.Cache.UpdateCache(@event.Userid, TypeUpdate.Death);
        
-        Instance.Cache.UpdateCache(@event.Assister, TypeUpdate.Assist, null);
+        Instance.Cache.UpdateCache(@event.Assister, TypeUpdate.Assist);
 
         if (@event.Attacker != null && @event.Attacker != @event.Userid)
         {
-            Instance.Cache.UpdateCache(@event.Attacker, TypeUpdate.Kill, null);
+            Instance.Cache.UpdateCache(@event.Attacker, TypeUpdate.Kill);
             if (@event.Headshot){
-                Instance.Cache.UpdateCache(@event.Attacker, TypeUpdate.Headshot, null);
+                Instance.Cache.UpdateCache(@event.Attacker, TypeUpdate.Headshot);
             }
             if (@event.Weapon == "knife"){
-                Instance.Cache.UpdateCache(@event.Attacker, TypeUpdate.KillKnife, null);
+                Instance.Cache.UpdateCache(@event.Attacker, TypeUpdate.KillKnife);
             }
         }
         
@@ -82,7 +79,7 @@ public class Events {
 
     private HookResult OnPlayerShoot(EventPlayerShoot @event, GameEventInfo info)
     {
-        Instance.Cache.UpdateCache(@event.Userid, TypeUpdate.Shoots, null);
+        Instance.Cache.UpdateCache(@event.Userid, TypeUpdate.Shoots);
 
         return HookResult.Continue;
     }
