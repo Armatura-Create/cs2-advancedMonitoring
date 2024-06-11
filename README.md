@@ -55,6 +55,7 @@ curl -X GET http://server-ip:server-port/monitoring-info/
     "Players": [
         {
             "Name": "PlayerName",
+            "Slot": 2,
             "SteamID64": "123",
             "SteamID32": "123",
             "SteamID2": "STEAM_0:1:123",
