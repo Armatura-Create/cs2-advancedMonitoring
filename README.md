@@ -30,6 +30,7 @@ Config File located in **/addons/counterstrikesharp/configs/plugins/AdvancedMoni
 
 - Endpoint: The access point for HTTP requests.
 - MinIntervalUpdate: The minimum interval for server data updates in seconds.
+- AccessFriendlyDamage: Adds damage accounting on DM servers
 - ShowBots: Whether to show bots in the player list.
 - ShowHLTV: Whether to show HLTV players in the player list.
 - Debug: Enable debug mode for logging console server.
