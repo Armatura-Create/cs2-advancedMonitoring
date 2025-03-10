@@ -1,7 +1,9 @@
+using AdvancedMonitoring.cache;
+using AdvancedMonitoring.library;
 using CounterStrikeSharp.API.Core;
 using static AdvancedMonitoring.AdvancedMonitoring;
 
-namespace AdvancedMonitoring;
+namespace AdvancedMonitoring.events;
 
 public class Events {
 
@@ -17,7 +19,7 @@ public class Events {
 
     private HookResult OnRoundEnd(EventRoundEnd @event, GameEventInfo info)
     {
-        Library.GetTeamScore(out int tscore, out int ctscore);
+        Library.GetTeamScore(out var tscore, out var ctscore);
 
         Instance.Cache.UpdateRoundEnd(tscore, ctscore);
 
@@ -44,24 +46,23 @@ public class Events {
        
         Instance.Cache.UpdateCache(@event.Assister, TypeUpdate.Assist);
 
-        if (@event.Attacker != null && @event.Attacker != @event.Userid)
-        {
-            Instance.Cache.UpdateCache(@event.Attacker, TypeUpdate.Kill);
-            if (@event.Headshot){
-                Instance.Cache.UpdateCache(@event.Attacker, TypeUpdate.Headshot);
-            }
-            if (@event.Weapon == "knife"){
-                Instance.Cache.UpdateCache(@event.Attacker, TypeUpdate.KillKnife);
-            }
-        }
+        if (@event.Attacker == null || @event.Attacker == @event.Userid) return HookResult.Continue;
         
+        Instance.Cache.UpdateCache(@event.Attacker, TypeUpdate.Kill);
+        if (@event.Headshot){
+            Instance.Cache.UpdateCache(@event.Attacker, TypeUpdate.Headshot);
+        }
+        if (@event.Weapon == "knife"){
+            Instance.Cache.UpdateCache(@event.Attacker, TypeUpdate.KillKnife);
+        }
+
         return HookResult.Continue;
     }
 
     private HookResult OnPlayerHurt(EventPlayerHurt @event, GameEventInfo info)
     {
-        CCSPlayerController? victim = @event.Userid;
-        CCSPlayerController? attacker = @event.Attacker;
+        var victim = @event.Userid;
+        var attacker = @event.Attacker;
 
         if (victim == null || attacker == null)
             return HookResult.Continue;

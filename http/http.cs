@@ -1,39 +1,43 @@
 using System.Net;
 using System.Text;
 using System.Text.Json;
+using AdvancedMonitoring.dto;
+using AdvancedMonitoring.library;
 using static AdvancedMonitoring.AdvancedMonitoring;
 
-namespace AdvancedMonitoring;
+namespace AdvancedMonitoring.http;
 
 public class HttpSupport {
 
-    private HttpListener? Listener = null;
-    private CancellationTokenSource? cts = null;
+    private HttpListener? _listener;
+    private CancellationTokenSource? _cts;
 
-    private readonly Dictionary<string, DateTime> RequestTimestamps = [];
-    private readonly TimeSpan RequestInterval = TimeSpan.FromSeconds(5); // Интервал в секундах между запросами
+    private readonly Dictionary<string, DateTime> _requestTimestamps = [];
+    private readonly TimeSpan _requestInterval = TimeSpan.FromSeconds(5); // Интервал в секундах между запросами
 
-    public void StartHttpListener(int port, string endpoint) {
-        if (!HttpListener.IsSupported) 
-        {
+    public void StartHttpListener(string ip, int port, string endpoint) {
+        if (!HttpListener.IsSupported) {
             Console.WriteLine("HTTP listener is not supported on this platform.");
             return;
         }
 
-        Listener?.Stop();
-        Listener?.Close();
-        cts?.Cancel();
+        _listener?.Stop();
+        _listener?.Close();
+        _cts?.Cancel();
 
-        cts = new CancellationTokenSource();
+        _cts = new CancellationTokenSource();
 
-        Library.PrintConsole($"Starting HTTP server http://*:{port}/{endpoint}/");
+        // Сформируем строку префикса
+        // Например: "http://192.168.1.10:27015/monitoring-info/"
+        var prefix = $"http://{ip}:{port}/{endpoint}/";
+        Library.PrintConsole($"Starting HTTP server {prefix}");
 
-        Listener = new HttpListener();
-        Listener.Prefixes.Add($"http://*:{port}/{endpoint}/");
-        Listener.Start();
+        _listener = new HttpListener();
+        _listener.Prefixes.Add(prefix);
+        _listener.Start();
 
-        Task.Run(() => ListenForRequests(cts.Token));
-        
+        Task.Run(() => ListenForRequests(_cts.Token));
+
         Library.PrintConsole("HTTP server started.");
     }
 
@@ -41,14 +45,15 @@ public class HttpSupport {
     {
         while (!token.IsCancellationRequested)
         {
-            if (Listener == null)
+            if (_listener == null)
             {
                 Library.PrintConsole("Listener is null.");
                 return;
             }
-             try
+            
+            try
             {
-                var context = await Listener.GetContextAsync();
+                var context = await _listener.GetContextAsync();
                 var clientIp = context.Request.RemoteEndPoint?.Address.ToString();
 
                 
@@ -69,9 +74,9 @@ public class HttpSupport {
                 {
                     Library.PrintConsole("Too many requests from: " + clientIp);
 
-                    RequestTimestamps.TryGetValue(clientIp!, out DateTime lastRequestTime);
+                    _requestTimestamps.TryGetValue(clientIp!, out DateTime lastRequestTime);
 
-                    SendError(context, HttpStatusCode.TooManyRequests, $"Too Many Requests - Please wait {RequestInterval.TotalSeconds - (DateTime.UtcNow - lastRequestTime).TotalSeconds} seconds.");
+                    SendError(context, HttpStatusCode.TooManyRequests, $"Too Many Requests - Please wait {_requestInterval.TotalSeconds - (DateTime.UtcNow - lastRequestTime).TotalSeconds} seconds.");
                 }
             }
             catch (Exception ex)
@@ -134,25 +139,25 @@ public class HttpSupport {
             return false;
         }
 
-        if (RequestTimestamps.TryGetValue(clientIp, out DateTime lastRequestTime))
+        if (_requestTimestamps.TryGetValue(clientIp, out DateTime lastRequestTime))
         {
-            if (DateTime.UtcNow - lastRequestTime < RequestInterval)
+            if (DateTime.UtcNow - lastRequestTime < _requestInterval)
             {
                 return false;
             }
         }
 
-        RequestTimestamps[clientIp] = DateTime.UtcNow;
+        _requestTimestamps[clientIp] = DateTime.UtcNow;
         return true;
     }
 
 
     public void StopHttpListener()
     {   
-        Listener?.Stop();
-        Listener?.Close();
+        _listener?.Stop();
+        _listener?.Close();
 
-        cts?.Cancel();
+        _cts?.Cancel();
         
         Library.PrintConsole("HTTP server stopped.");
     }

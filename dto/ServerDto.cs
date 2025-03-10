@@ -1,4 +1,4 @@
-namespace AdvancedMonitoring;
+namespace AdvancedMonitoring.dto;
 
 public class ServerDto
 {

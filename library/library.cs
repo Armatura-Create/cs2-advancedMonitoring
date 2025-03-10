@@ -2,14 +2,14 @@ using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using static AdvancedMonitoring.AdvancedMonitoring;
 
-namespace AdvancedMonitoring;
+namespace AdvancedMonitoring.library;
 
 public static class Library {
     public static void PrintConsole(string? message)
     {
         if (Instance.Config.Debug)
         {
-            Console.WriteLine($"{Instance.ModuleName} {message}");
+            Console.WriteLine($"[{Instance.ModuleName}] {message}");
         }
     }
 
@@ -20,7 +20,7 @@ public static class Library {
 
         var csteammanager = Utilities.FindAllEntitiesByDesignerName<CCSTeam>("cs_team_manager");
 
-        foreach (CCSTeam team in csteammanager)
+        foreach (var team in csteammanager)
         {
             switch (team.TeamNum)
             {
@@ -46,8 +46,8 @@ public static class Library {
         {
             TypeSteamId.SteamID64 => player.AuthorizedSteamID?.SteamId64.ToString(),
             TypeSteamId.SteamID32 => player.AuthorizedSteamID?.SteamId32.ToString(),
-            TypeSteamId.SteamID2 => player.AuthorizedSteamID?.SteamId2.ToString(),
-            TypeSteamId.SteamID3 => player.AuthorizedSteamID?.SteamId3.ToString(),
+            TypeSteamId.SteamID2 => player.AuthorizedSteamID?.SteamId2,
+            TypeSteamId.SteamID3 => player.AuthorizedSteamID?.SteamId3,
             _ => null,
         };
     }

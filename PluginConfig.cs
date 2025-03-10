@@ -5,6 +5,9 @@ public class PluginConfig : BasePluginConfig
 {
     [JsonPropertyName("endpoint")]
     public string Endpoint { get; set; } = "monitoring-info";
+    
+    [JsonPropertyName("ip")]
+    public string IP { get; set; } = "0.0.0.0";
 
     [JsonPropertyName("min_interval_update")]
     public int MinIntervalUpdate { get; set; } = 30;

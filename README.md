@@ -20,6 +20,7 @@ Config File located in **/addons/counterstrikesharp/configs/plugins/AdvancedMoni
 ``` json
 {
     "Endpoint": "monitoring-info",
+    "IP": "0.0.0.0",
     "MinIntervalUpdate": 30,
     "AccessFriendlyDamage": false,
     "ShowBots": true,
@@ -29,6 +30,7 @@ Config File located in **/addons/counterstrikesharp/configs/plugins/AdvancedMoni
 ```
 
 - Endpoint: The access point for HTTP requests.
+- IP: The IP address of the server (If not automatically set ip).
 - MinIntervalUpdate: The minimum interval for server data updates in seconds.
 - AccessFriendlyDamage: Adds damage accounting on DM servers
 - ShowBots: Whether to show bots in the player list.
@@ -83,4 +85,4 @@ curl -X GET http://server-ip:server-port/monitoring-info/
 ```
 
 # Requirements:
-[CounterStrikeSharp](https://github.com/roflmuffin/CounterStrikeSharp) v236 or higher
+[CounterStrikeSharp](https://github.com/roflmuffin/CounterStrikeSharp) v305 or higher
